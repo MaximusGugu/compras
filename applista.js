@@ -3,16 +3,16 @@ let produtos = JSON.parse(localStorage.getItem("shopping_list_data")) || [];
 const listaDOM = document.getElementById("listaCompras");
 const btnAdd = document.getElementById("btnAddItem");
 const btnReset = document.getElementById("btnReset");
+const btnCopy = document.getElementById("btnCopyList");
+const btnClearAll = document.getElementById("btnClearAll");
 
-// Inicializar Sortable (Arrastar)
+// Inicializar Sortable
 if (listaDOM) {
     new Sortable(listaDOM, {
         animation: 150,
         handle: '.drag-handle',
         ghostClass: 'sortable-ghost',
-        onEnd: () => {
-            reordenarArray();
-        }
+        onEnd: () => reordenarArray()
     });
 }
 
@@ -41,13 +41,11 @@ function render() {
             <div class="drag-handle">⠿</div>
             <input type="checkbox" class="check-item" ${prod.checked ? 'checked' : ''}>
             <input type="text" class="input-item" value="${prod.nome}" placeholder="Item...">
-            
             <div class="qty-controls">
                 <button class="btn-qty minus">-</button>
                 <input type="number" class="input-qty" value="${prod.qtd}" readonly>
                 <button class="btn-qty plus">+</button>
             </div>
-
             <button class="btn-del">×</button>
         `;
 
@@ -57,46 +55,19 @@ function render() {
         const btnPlus = div.querySelector(".plus");
         const btnDel = div.querySelector(".btn-del");
 
-        check.onchange = () => {
-            prod.checked = check.checked;
-            salvar();
-            render();
-        };
-
-        inputNome.onblur = () => {
-            prod.nome = inputNome.value;
-            salvar();
-        };
-
+        check.onchange = () => { prod.checked = check.checked; salvar(); render(); };
+        inputNome.onblur = () => { prod.nome = inputNome.value; salvar(); };
         inputNome.onkeydown = (e) => { if(e.key === "Enter") inputNome.blur(); };
 
-        btnMinus.onclick = (e) => {
-            e.preventDefault();
-            if (prod.qtd > 1) {
-                prod.qtd--;
-                salvar();
-                render();
-            }
-        };
-
-        btnPlus.onclick = (e) => {
-            e.preventDefault();
-            prod.qtd++;
-            salvar();
-            render();
-        };
-
-        btnDel.onclick = () => {
-            produtos = produtos.filter(p => p.id !== prod.id);
-            salvar();
-            render();
-        };
+        btnMinus.onclick = () => { if (prod.qtd > 1) { prod.qtd--; salvar(); render(); } };
+        btnPlus.onclick = () => { prod.qtd++; salvar(); render(); };
+        btnDel.onclick = () => { produtos = produtos.filter(p => p.id !== prod.id); salvar(); render(); };
 
         listaDOM.appendChild(div);
     });
 }
 
-// Eventos Globais
+// Eventos de Botões
 btnAdd.onclick = () => {
     produtos.push({ id: Date.now(), nome: "", qtd: 1, checked: false });
     render();
@@ -105,14 +76,28 @@ btnAdd.onclick = () => {
 };
 
 btnReset.onclick = () => {
-    if(confirm("Limpar marcações?")) {
+    if(confirm("Limpar marcações (checks)?")) {
         produtos.forEach(p => p.checked = false);
         salvar();
         render();
     }
 };
 
-// Modal Import
+btnClearAll.onclick = () => {
+    if(confirm("ATENÇÃO: Isso apagará TODOS os itens da sua lista. Confirma?")) {
+        produtos = [];
+        salvar();
+        render();
+    }
+};
+
+btnCopy.onclick = () => {
+    if (produtos.length === 0) return alert("A lista está vazia!");
+    const textoParaCopiar = produtos.map(p => `${p.nome} x ${p.qtd}`).join('\n');
+    navigator.clipboard.writeText(textoParaCopiar).then(() => alert("Lista copiada!"));
+};
+
+// --- IMPORTAÇÃO INTELIGENTE ---
 const modalImport = document.getElementById("modalImport");
 const btnOpenBulk = document.getElementById("btnOpenBulk");
 const btnCancelarImport = document.getElementById("btnCancelarImport");
@@ -121,16 +106,29 @@ const textoListaBulk = document.getElementById("textoListaBulk");
 
 if(btnOpenBulk) btnOpenBulk.onclick = () => modalImport.style.display = "flex";
 if(btnCancelarImport) btnCancelarImport.onclick = () => modalImport.style.display = "none";
+
 if(btnConfirmarImport) {
     btnConfirmarImport.onclick = () => {
         const texto = textoListaBulk.value.trim();
         if (texto) {
             texto.split('\n').forEach(linha => {
-                if (linha.trim()) {
+                let nomeFinal = linha.trim();
+                let qtdFinal = 1;
+
+                // Regex para identificar "Nome do Item x 5" ou "Nome do Item x5"
+                const regexQtd = /^(.*?)\s+x\s*(\d+)$/i;
+                const match = nomeFinal.match(regexQtd);
+
+                if (match) {
+                    nomeFinal = match[1].trim(); // Nome do item
+                    qtdFinal = parseInt(match[2]); // Quantidade
+                }
+
+                if (nomeFinal) {
                     produtos.push({
                         id: Date.now() + Math.random(),
-                        nome: linha.trim(),
-                        qtd: 1,
+                        nome: nomeFinal,
+                        qtd: qtdFinal,
                         checked: false
                     });
                 }
