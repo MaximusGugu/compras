@@ -150,4 +150,23 @@ function salvar() {
     localStorage.setItem("shopping_list_data", JSON.stringify(produtos));
 }
 
+document.addEventListener('touchstart', function (event) {
+    if (event.touches.length > 1) {
+        event.preventDefault(); // Impede zoom de múltiplos dedos se necessário
+    }
+}, { passive: false });
+
+let lastTouchEnd = 0;
+document.addEventListener('touchend', function (event) {
+    let now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        // Se o tempo entre toques for menor que 300ms (double tap)
+        // e o alvo for um botão de quantidade, previne o zoom
+        if (event.target.classList.contains('btn-qty')) {
+            event.preventDefault();
+        }
+    }
+    lastTouchEnd = now;
+}, false);
+
 render();
