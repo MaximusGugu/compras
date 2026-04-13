@@ -59,7 +59,7 @@ function render() {
         inputNome.onblur = () => { prod.nome = inputNome.value; salvar(); };
         inputNome.onkeydown = (e) => { if(e.key === "Enter") inputNome.blur(); };
 
-        btnMinus.onclick = () => { if (prod.qtd > 1) { prod.qtd--; salvar(); render(); } };
+        btnMinus.onclick = () => { if (prod.qtd > 0) { prod.qtd--; salvar(); render(); } };
         btnPlus.onclick = () => { prod.qtd++; salvar(); render(); };
         btnDel.onclick = () => { produtos = produtos.filter(p => p.id !== prod.id); salvar(); render(); };
 
@@ -69,7 +69,12 @@ function render() {
 
 // Eventos de Botões
 btnAdd.onclick = () => {
-    produtos.push({ id: Date.now(), nome: "", qtd: 1, checked: false });
+    produtos.push({ 
+        id: Date.now(), 
+        nome: "", 
+        qtd: 0, // Mude aqui para 0 se quiser que comece zerado
+        checked: false 
+    });
     render();
     const inputs = document.querySelectorAll(".input-item");
     if(inputs.length > 0) inputs[inputs.length - 1].focus();

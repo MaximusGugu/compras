@@ -39,7 +39,7 @@ body {
     padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.08);
     gap: 5px; background-color: var(--P03);
 }
-.item-compra.marcado { opacity: 0.4; }
+.item-compra.marcado { opacity: 0.2; }
 .drag-handle { color: var(--P06); cursor: grab; font-size: 18px; opacity: 0.4; padding: 0 5px; }
 
 /* CHECKBOX CIRCULAR */
@@ -71,6 +71,9 @@ body {
     border: none; background: var(--P06); color: white;
     font-size: 18px; display: flex; align-items: center; justify-content: center;
     cursor: pointer;
+    touch-action: manipulation;
+    user-select: none; /* Evita que o texto '+' ou '-' fique selecionado ao clicar rápido */
+    -webkit-user-select: none;
 }
 .input-qty {
     width: 25px; text-align: center; border: none;
@@ -95,6 +98,7 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
+    touch-action: manipulation;
 }
 
 .btn-main {
