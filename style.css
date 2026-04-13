@@ -1,0 +1,92 @@
+:root {
+    --P01: #FFF8E7; --P03: #F8EED7; --P04: #D78341;
+    --P05: #586E5F; --P06: #3C5558; --P07: #392B22; --PAGO: #2ecc71;
+}
+
+body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: var(--P03);
+    color: var(--P07);
+    margin: 0; padding: 0;
+}
+
+.container { padding: 0 10px; }
+.row-between { display: flex; justify-content: space-between; align-items: center; }
+
+.header-compact {
+    background-color: var(--P06);
+    padding: 8px 0;
+    position: sticky; top: 0; z-index: 10;
+}
+.header-compact h1 { color: var(--P01); font-size: 13px; margin: 0; letter-spacing: 1px; }
+
+/* --- LISTA LINEAR COMPACTA --- */
+.item-compra {
+    display: flex;
+    align-items: center;
+    padding: 6px 0; /* Padding reduzido para ser compacto */
+    border-bottom: 1px solid rgba(0,0,0,0.08);
+    gap: 8px;
+    background-color: var(--P03);
+}
+
+.item-compra.marcado { opacity: 0.4; }
+
+.drag-handle { color: var(--P06); cursor: grab; font-size: 16px; opacity: 0.4; padding: 0 4px; }
+
+.check-item {
+    appearance: none; -webkit-appearance: none;
+    width: 24px; height: 24px;
+    border-radius: 50%;
+    border: 2px solid var(--P06);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+}
+.check-item:checked { background-color: var(--PAGO); border-color: var(--PAGO); }
+.check-item:checked::after { content: '✓'; color: white; font-size: 13px; font-weight: bold; }
+
+.input-item {
+    background: transparent; border: none;
+    font-size: 15px; color: var(--P07);
+    flex: 1; min-width: 50px; outline: none;
+}
+.item-compra.marcado .input-item { text-decoration: line-through; }
+
+/* CONTROLES QTD (COLADOS NO TEXTO) */
+.qty-controls {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    background: rgba(0,0,0,0.05);
+    border-radius: 6px;
+    padding: 2px;
+}
+
+.btn-qty {
+    width: 24px; height: 24px;
+    border-radius: 4px; border: none;
+    background: var(--P06); color: white;
+    font-size: 16px; display: flex; align-items: center; justify-content: center;
+}
+
+.input-qty {
+    width: 22px; text-align: center; border: none; 
+    background: transparent; font-size: 13px; font-weight: bold;
+}
+
+.btn-del {
+    background: transparent; color: #e74c3c; border: none;
+    font-size: 18px; padding: 0 4px; margin-left: 5px;
+}
+
+/* BOTÕES RODAPÉ */
+.btn-main { width: 100%; background: var(--P06); color: var(--P01); padding: 14px; border: none; border-radius: 8px; font-weight: bold; margin-top: 15px; }
+.btn-sub { width: 100%; background: transparent; border: 1px dashed var(--P06); color: var(--P06); padding: 10px; margin-top: 8px; border-radius: 8px; }
+.btn-text { background: transparent; border: none; color: var(--P04); font-weight: bold; font-size: 11px; }
+
+.bottom-actions { padding: 10px 0 30px 0; }
+
+/* MODAL */
+.modal-overlay { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:100; }
+.modal-content { background: var(--P03); padding: 20px; border-radius: 12px; width: 90%; }
+textarea { width: 100%; height: 120px; border-radius: 8px; padding: 10px; border: 1px solid var(--P06); margin: 10px 0; font-family: inherit; }

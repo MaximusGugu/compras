@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Lista - Planetário</title>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="theme-planetario">
+    <header class="header-compact">
+        <div class="container row-between">
+            <h1>LISTA DE COMPRAS</h1>
+            <button id="btnReset" class="btn-text">LIMPAR</button>
+        </div>
+    </header>
+
+    <main class="container">
+        <div id="listaCompras" class="list-container">
+            <!-- Itens gerados pelo JS -->
+        </div>
+        
+        <div class="bottom-actions">
+            <button id="btnAddItem" class="btn-main">+ ADICIONAR ITEM</button>
+            <button id="btnOpenBulk" class="btn-sub">IMPORTAR LISTA TEXTUAL</button>
+        </div>
+    </main>
+
+    <div id="modalImport" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <h3>Importar Texto</h3>
+            <textarea id="textoListaBulk" placeholder="Cole aqui (um item por linha)"></textarea>
+            <div class="modal-buttons">
+                <button id="btnConfirmarImport" class="btn-main">CONVERTER EM ITENS</button>
+                <button id="btnCancelarImport" class="btn-text">CANCELAR</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="applista.js"></script>
+</body>
+</html>
