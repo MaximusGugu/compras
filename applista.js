@@ -1,51 +1,47 @@
-let produtos = JSON.parse(localStorage.getItem("shopping_list_data")) || [];
+let db = JSON.parse(localStorage.getItem("shopping_planetario_db")) || {
+    ativoId: Date.now(),
+    listas: [{ id: Date.now(), nome: "MINHA LISTA", itens: [], showQty: true }]
+};
 
 const listaDOM = document.getElementById("listaCompras");
-const btnAdd = document.getElementById("btnAddItem");
-const btnReset = document.getElementById("btnReset");
-const btnCopy = document.getElementById("btnCopyList");
-const btnClearAll = document.getElementById("btnClearAll");
+const tituloLista = document.getElementById("tituloLista");
 
 // Inicializar Sortable
 if (listaDOM) {
     new Sortable(listaDOM, {
-        animation: 150,
-        handle: '.drag-handle',
-        ghostClass: 'sortable-ghost',
-        onEnd: () => reordenarArray()
+        animation: 150, handle: '.drag-handle', ghostClass: 'sortable-ghost',
+        onEnd: () => reordenarItens()
     });
 }
 
-function reordenarArray() {
-    const novosItens = [];
-    const itensHTML = listaDOM.querySelectorAll('.item-compra');
-    itensHTML.forEach(el => {
-        const id = el.getAttribute('data-id');
-        const produto = produtos.find(p => String(p.id) === String(id));
-        if (produto) novosItens.push(produto);
-    });
-    produtos = novosItens;
-    salvar();
+function getListaAtiva() {
+    return db.listas.find(l => l.id === db.ativoId) || db.listas[0];
 }
 
 function render() {
-    if (!listaDOM) return;
+    const listaAtiva = getListaAtiva();
+    tituloLista.innerText = listaAtiva.nome;
     listaDOM.innerHTML = "";
     
-    produtos.forEach((prod) => {
+    listaAtiva.itens.forEach((prod) => {
         const div = document.createElement("div");
         div.className = `item-compra ${prod.checked ? 'marcado' : ''}`;
         div.setAttribute('data-id', prod.id);
         
-        div.innerHTML = `
-            <div class="drag-handle">⠿</div>
-            <input type="checkbox" class="check-item" ${prod.checked ? 'checked' : ''}>
-            <input type="text" class="input-item" value="${prod.nome}" placeholder="Item...">
+        // Lógica do Toggle de Quantidades
+        const qtyHtml = (listaAtiva.showQty !== false) ? `
             <div class="qty-controls">
                 <button class="btn-qty minus">-</button>
                 <input type="number" class="input-qty" value="${prod.qtd}" readonly>
                 <button class="btn-qty plus">+</button>
             </div>
+        ` : '';
+
+        div.innerHTML = `
+            <div class="drag-handle">⠿</div>
+            <input type="checkbox" class="check-item" ${prod.checked ? 'checked' : ''}>
+            <input type="text" class="input-item" value="${prod.nome}" placeholder="Item...">
+            ${qtyHtml}
             <button class="btn-del">×</button>
         `;
 
@@ -58,115 +54,134 @@ function render() {
         check.onchange = () => { prod.checked = check.checked; salvar(); render(); };
         inputNome.onblur = () => { prod.nome = inputNome.value; salvar(); };
         inputNome.onkeydown = (e) => { if(e.key === "Enter") inputNome.blur(); };
-
-        btnMinus.onclick = () => { if (prod.qtd > 0) { prod.qtd--; salvar(); render(); } };
-        btnPlus.onclick = () => { prod.qtd++; salvar(); render(); };
-        btnDel.onclick = () => { produtos = produtos.filter(p => p.id !== prod.id); salvar(); render(); };
+        
+        if (btnMinus) btnMinus.onclick = () => { if (prod.qtd > 0) { prod.qtd--; salvar(); render(); } };
+        if (btnPlus) btnPlus.onclick = () => { prod.qtd++; salvar(); render(); };
+        
+        btnDel.onclick = () => { 
+            listaAtiva.itens = listaAtiva.itens.filter(p => p.id !== prod.id); 
+            salvar(); render(); 
+        };
 
         listaDOM.appendChild(div);
     });
 }
 
-// Eventos de Botões
-btnAdd.onclick = () => {
-    produtos.push({ 
-        id: Date.now(), 
-        nome: "", 
-        qtd: 0, // Mude aqui para 0 se quiser que comece zerado
-        checked: false 
+// --- MODAIS ---
+function abrirModal(id) { document.getElementById(id).style.display = "flex"; }
+function fecharModal(id) { document.getElementById(id).style.display = "none"; }
+
+// --- MENU SANDUÍCHE (LISTAS) ---
+document.getElementById("btnMenu").onclick = () => {
+    const container = document.getElementById("containerMinhasListas");
+    container.innerHTML = "";
+    db.listas.forEach(l => {
+        const btn = document.createElement("div");
+        btn.className = `btn-lista-opcao ${l.id === db.ativoId ? 'active' : ''}`;
+        btn.innerHTML = `<span>${l.nome}</span> ${db.listas.length > 1 ? '<button class="btn-del-lista" style="background:none; border:none; color:red; font-size:18px;">✖</button>' : ''}`;
+        btn.onclick = () => { db.ativoId = l.id; salvar(); render(); fecharModal('modalListas'); };
+        const btnDel = btn.querySelector(".btn-del-lista");
+        if(btnDel) btnDel.onclick = (e) => {
+            e.stopPropagation();
+            if(confirm(`Excluir a lista "${l.nome}"?`)) {
+                db.listas = db.listas.filter(item => item.id !== l.id);
+                if(db.ativoId === l.id) db.ativoId = db.listas[0].id;
+                salvar(); fecharModal('modalListas'); render();
+            }
+        };
+        container.appendChild(btn);
     });
+    abrirModal('modalListas');
+};
+
+document.getElementById("btnCriarLista").onclick = () => {
+    const nome = document.getElementById("inputNomeNovaLista").value.trim();
+    if(!nome) return alert("Digite um nome!");
+    const nova = { id: Date.now(), nome: nome.toUpperCase(), itens: [], showQty: true };
+    db.listas.push(nova);
+    db.ativoId = nova.id;
+    document.getElementById("inputNomeNovaLista").value = "";
+    salvar(); fecharModal('modalListas'); render();
+};
+
+// --- EDITAR DETALHES ---
+document.getElementById("btnEditDetails").onclick = () => {
+    const lista = getListaAtiva();
+    document.getElementById("inputEditNomeLista").value = lista.nome;
+    document.getElementById("toggleShowQty").checked = (lista.showQty !== false);
+    abrirModal('modalEditList');
+};
+
+document.getElementById("btnSalvarDetalhes").onclick = () => {
+    const lista = getListaAtiva();
+    const novoNome = document.getElementById("inputEditNomeLista").value.trim().toUpperCase();
+    if(!novoNome) return alert("Nome inválido!");
+    
+    lista.nome = novoNome;
+    lista.showQty = document.getElementById("toggleShowQty").checked;
+    
+    salvar(); render(); fecharModal('modalEditList');
+};
+
+// --- AÇÕES RODAPÉ ---
+document.getElementById("btnAddItem").onclick = () => {
+    getListaAtiva().itens.push({ id: Date.now(), nome: "", qtd: 1, checked: false });
     render();
     const inputs = document.querySelectorAll(".input-item");
     if(inputs.length > 0) inputs[inputs.length - 1].focus();
 };
 
-btnReset.onclick = () => {
-    if(confirm("Limpar marcações (checks)?")) {
-        produtos.forEach(p => p.checked = false);
-        salvar();
-        render();
+document.getElementById("btnResetChecks").onclick = () => {
+    if(confirm("Resetar checks desta lista?")) {
+        getListaAtiva().itens.forEach(p => p.checked = false);
+        salvar(); render();
     }
 };
 
-btnClearAll.onclick = () => {
-    if(confirm("ATENÇÃO: Isso apagará TODOS os itens da sua lista. Confirma?")) {
-        produtos = [];
-        salvar();
-        render();
+document.getElementById("btnClearAll").onclick = () => {
+    if(confirm("Apagar todos os itens da lista?")) {
+        getListaAtiva().itens = [];
+        salvar(); render();
     }
 };
 
-btnCopy.onclick = () => {
-    if (produtos.length === 0) return alert("A lista está vazia!");
-    const textoParaCopiar = produtos.map(p => `${p.nome} x ${p.qtd}`).join('\n');
-    navigator.clipboard.writeText(textoParaCopiar).then(() => alert("Lista copiada!"));
+document.getElementById("btnCopyList").onclick = () => {
+    const lista = getListaAtiva();
+    if (lista.itens.length === 0) return alert("Lista vazia!");
+    const texto = lista.itens.map(p => `${p.nome}${lista.showQty ? ' x ' + p.qtd : ''}`).join('\n');
+    navigator.clipboard.writeText(texto).then(() => alert("Copiado para a área de transferência!"));
 };
 
-// --- IMPORTAÇÃO INTELIGENTE ---
-const modalImport = document.getElementById("modalImport");
-const btnOpenBulk = document.getElementById("btnOpenBulk");
-const btnCancelarImport = document.getElementById("btnCancelarImport");
-const btnConfirmarImport = document.getElementById("btnConfirmarImport");
-const textoListaBulk = document.getElementById("textoListaBulk");
+// --- IMPORTAÇÃO ---
+document.getElementById("btnOpenBulk").onclick = () => abrirModal('modalImport');
+document.getElementById("btnConfirmarImport").onclick = () => {
+    const texto = document.getElementById("textoListaBulk").value.trim();
+    if (texto) {
+        texto.split('\n').forEach(linha => {
+            let nome = linha.trim();
+            let qtd = 1;
+            const match = nome.match(/^(.*?)\s+x\s*(\d+)$/i);
+            if (match) { nome = match[1].trim(); qtd = parseInt(match[2]); }
+            if (nome) getListaAtiva().itens.push({ id: Date.now() + Math.random(), nome: nome, qtd: qtd, checked: false });
+        });
+        salvar(); render();
+    }
+    fecharModal('modalImport');
+    document.getElementById("textoListaBulk").value = "";
+};
 
-if(btnOpenBulk) btnOpenBulk.onclick = () => modalImport.style.display = "flex";
-if(btnCancelarImport) btnCancelarImport.onclick = () => modalImport.style.display = "none";
-
-if(btnConfirmarImport) {
-    btnConfirmarImport.onclick = () => {
-        const texto = textoListaBulk.value.trim();
-        if (texto) {
-            texto.split('\n').forEach(linha => {
-                let nomeFinal = linha.trim();
-                let qtdFinal = 1;
-
-                // Regex para identificar "Nome do Item x 5" ou "Nome do Item x5"
-                const regexQtd = /^(.*?)\s+x\s*(\d+)$/i;
-                const match = nomeFinal.match(regexQtd);
-
-                if (match) {
-                    nomeFinal = match[1].trim(); // Nome do item
-                    qtdFinal = parseInt(match[2]); // Quantidade
-                }
-
-                if (nomeFinal) {
-                    produtos.push({
-                        id: Date.now() + Math.random(),
-                        nome: nomeFinal,
-                        qtd: qtdFinal,
-                        checked: false
-                    });
-                }
-            });
-            salvar();
-            render();
-        }
-        modalImport.style.display = "none";
-        textoListaBulk.value = "";
-    };
+function reordenarItens() {
+    const listaAtiva = getListaAtiva();
+    const novosItens = [];
+    listaDOM.querySelectorAll('.item-compra').forEach(el => {
+        const id = el.getAttribute('data-id');
+        const item = listaAtiva.itens.find(p => String(p.id) === String(id));
+        if (item) novosItens.push(item);
+    });
+    listaAtiva.itens = novosItens;
+    salvar();
 }
 
-function salvar() {
-    localStorage.setItem("shopping_list_data", JSON.stringify(produtos));
-}
-
-document.addEventListener('touchstart', function (event) {
-    if (event.touches.length > 1) {
-        event.preventDefault(); // Impede zoom de múltiplos dedos se necessário
-    }
-}, { passive: false });
-
-let lastTouchEnd = 0;
-document.addEventListener('touchend', function (event) {
-    let now = (new Date()).getTime();
-    if (now - lastTouchEnd <= 300) {
-        // Se o tempo entre toques for menor que 300ms (double tap)
-        // e o alvo for um botão de quantidade, previne o zoom
-        if (event.target.classList.contains('btn-qty')) {
-            event.preventDefault();
-        }
-    }
-    lastTouchEnd = now;
-}, false);
+function salvar() { localStorage.setItem("shopping_planetario_db", JSON.stringify(db)); }
 
 render();

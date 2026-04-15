@@ -1,6 +1,4 @@
-* {
-    box-sizing: border-box; /* Garante que padding e bordas não quebrem a largura */
-}
+* { box-sizing: border-box; }
 
 :root {
     --P01: #FFF8E7; --P03: #F8EED7; --P04: #D78341;
@@ -15,34 +13,34 @@ body {
     line-height: 1.4;
 }
 
-.container { 
-    padding: 0 15px; 
-    max-width: 600px; 
-    margin: 0 auto; 
-    width: 100%;
-}
-
+.container { padding: 0 15px; max-width: 600px; margin: 0 auto; width: 100%; }
 .row-between { display: flex; justify-content: space-between; align-items: center; }
+.row-gap { display: flex; gap: 10px; width: 100%; }
+.row-gap button { flex: 1; }
 
 /* --- HEADER --- */
 .header-compact {
     background-color: var(--P06);
     padding: 12px 0;
     position: sticky; top: 0; z-index: 10;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
-.header-compact h1 { color: var(--P01); font-size: 14px; margin: 0; letter-spacing: 1px; }
+.header-compact h1 { color: var(--P01); font-size: 14px; margin: 0; letter-spacing: 1px; flex: 1; }
+
+.btn-menu {
+    background: transparent; border: none;
+    color: var(--P01); font-size: 24px;
+    cursor: pointer; padding: 0 5px;
+}
 
 /* --- LISTA --- */
 .item-compra {
     display: flex; align-items: center;
     padding: 6px 0; border-bottom: 1px solid rgba(0,0,0,0.08);
-    gap: 5px; background-color: var(--P03);
+    gap: 8px; background-color: var(--P03);
 }
 .item-compra.marcado { opacity: 0.2; }
 .drag-handle { color: var(--P06); cursor: grab; font-size: 18px; opacity: 0.4; padding: 0 5px; }
 
-/* CHECKBOX CIRCULAR */
 .check-item {
     appearance: none; -webkit-appearance: none;
     width: 26px; height: 26px; border-radius: 50%;
@@ -53,127 +51,74 @@ body {
 .check-item:checked { background-color: var(--PAGO); border-color: var(--PAGO); }
 .check-item:checked::after { content: '✓'; color: white; font-size: 14px; font-weight: bold; }
 
-/* INPUT NOME */
-.input-item {
-    background: transparent; border: none;
-    font-size: 14px; color: var(--P07);
-    flex: 1; min-width: 50px; outline: none;
-}
-.item-compra.marcado .input-item { text-decoration: line-through; }
+.input-item { background: transparent; border: none; font-size: 14px; color: var(--P07); flex: 1; min-width: 50px; outline: none; }
+.qty-controls { display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.06); padding: 3px; border-radius: 10px; }
+.btn-qty { width: 28px; height: 28px; border-radius: 8px; border: none; background: var(--P06); color: white; font-size: 18px; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.input-qty { width: 25px; text-align: center; border: none; background: transparent; font-weight: bold; font-size: 14px; color: var(--P07); }
+.btn-del { background: transparent; color: #e74c3c; border: none; font-size: 24px; padding: 0 5px; cursor: pointer; }
 
-/* CONTROLES QUANTIDADE */
-.qty-controls {
-    display: flex; align-items: center; gap: 4px;
-    background: rgba(0,0,0,0.06); padding: 3px; border-radius: 10px;
-}
-.btn-qty {
-    width: 28px; height: 28px; border-radius: 8px;
-    border: none; background: var(--P06); color: white;
-    font-size: 18px; display: flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    touch-action: manipulation;
-    user-select: none; /* Evita que o texto '+' ou '-' fique selecionado ao clicar rápido */
-    -webkit-user-select: none;
-}
-.input-qty {
-    width: 25px; text-align: center; border: none;
-    background: transparent; font-weight: bold; font-size: 14px;
-    color: var(--P07);
-}
+/* --- BOTÕES --- */
+.btn { font-family: inherit; font-weight: bold; cursor: pointer; border-radius: 12px; transition: all 0.2s ease; border: none; display: flex; align-items: center; justify-content: center; touch-action: manipulation; }
+.btn-main { width: 100%; background-color: var(--P06); color: var(--P01); padding: 16px; font-size: 15px; }
+.btn-sub { background: transparent; border: 2px dashed var(--P06) !important; color: var(--P06); padding: 12px; font-size: 12px; width: 100%; }
+.btn-sub.danger { border-color: #e74c3c !important; color: #e74c3c; }
+.btn-text { background: transparent; color: var(--P04); font-size: 12px; font-weight: bold; border: none; cursor: pointer; }
 
-.btn-del {
-    background: transparent; color: #e74c3c; border: none;
-    font-size: 24px; padding: 0 5px; cursor: pointer;
-}
-
-/* --- PADRONIZAÇÃO DE BOTÕES --- */
-.btn {
-    font-family: inherit;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 12px; /* Botões mais arredondados e modernos */
-    transition: all 0.2s ease;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    touch-action: manipulation;
-}
-
-.btn-main {
-    width: 100%;
-    background-color: var(--P06);
-    color: var(--P01);
-    padding: 16px;
-    font-size: 15px;
-}
-
-.btn-sub {
-    width: 100%;
-    background: transparent;
-    border: 2px dashed var(--P06) !important;
-    color: var(--P06);
-    padding: 8px;
-    font-size: 13px;
-}
-
-.btn-sub.danger {
-    border-color: #e74c3c !important;
-    color: #e74c3c;
-}
-
-.btn-text {
-    background: transparent;
-    color: var(--P04);
-    font-size: 12px;
-    padding: 5px 10px;
-}
-
-.bottom-actions {
-    padding: 20px 0 40px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
+.bottom-actions { padding: 20px 0 40px 0; display: flex; flex-direction: column; gap: 10px; }
 .btn:active { transform: scale(0.97); opacity: 0.9; }
 
-/* --- MODAL RESPONSIVO --- */
-.modal-overlay { 
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-    background: rgba(0,0,0,0.8); display: flex; justify-content: center; 
-    align-items: center; z-index: 100; 
-    padding: 15px; /* Margem de segurança para o modal não colar na tela */
+/* --- MODAIS --- */
+.input-modal { border: 1px solid var(--P06); padding: 12px; border-radius: 8px; width: 100%; color: var(--P07); background: var(--P01); font-family: inherit; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center; z-index: 100; padding: 15px; }
+.modal-content { background: var(--P03); padding: 25px; border-radius: 20px; width: 100%; max-width: 450px; }
+textarea { width: 100%; height: 150px; border-radius: 12px; padding: 15px; border: 2px solid var(--P06); margin: 10px 0; font-family: inherit; font-size: 16px; background-color: var(--P01); resize: none; outline: none; }
+.modal-buttons { display: flex; flex-direction: column; gap: 10px; }
+
+.list-manager { display: flex; flex-direction: column; gap: 8px; max-height: 300px; overflow-y: auto; }
+.btn-lista-opcao { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid var(--P06); color: var(--P06); font-weight: bold; text-align: left; display: flex; justify-content: space-between; opacity: 1;}
+.btn-lista-opcao.active { background: var(--P06); color: var(--P01); opacity: 0.5;}
+
+/* ... (mantenha o resto igual e adicione ao final) ... */
+
+/* --- ESTILO DO TOGGLE (SWITCH) --- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 44px;
+  height: 24px;
 }
 
-.modal-content { 
-    background: var(--P03); 
-    padding: 25px; 
-    border-radius: 20px; 
-    width: 100%; 
-    max-width: 450px; /* Largura máxima no desktop */
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+.switch input { 
+  opacity: 0;
+  width: 0;
+  height: 0;
 }
 
-.modal-content h3 { margin: 0 0 15px 0; color: var(--P06); }
-
-textarea { 
-    width: 100%; 
-    height: 180px; 
-    border-radius: 12px; 
-    padding: 15px; 
-    border: 2px solid var(--P06); 
-    margin: 10px 0 20px 0; 
-    font-family: inherit; 
-    font-size: 16px; 
-    background-color: var(--P01);
-    resize: none;
-    outline: none;
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: #ccc;
+  transition: .4s;
+  border-radius: 24px;
 }
 
-.modal-buttons { 
-    display: flex; 
-    flex-direction: column; 
-    gap: 10px; 
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--PAGO);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
 }

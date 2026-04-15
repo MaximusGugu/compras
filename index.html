@@ -11,8 +11,8 @@
 <body class="theme-planetario">
     <header class="header-compact">
         <div class="container row-between">
-            <h1>LISTA DE COMPRAS</h1>
-            <button id="btnReset" class="btn-text">LIMPAR CHECKS</button>
+            <h1 id="tituloLista">NOME DA LISTA</h1>
+            <button id="btnMenu" class="btn-menu">☰</button>
         </div>
     </header>
 
@@ -21,23 +21,75 @@
             <!-- Itens -->
         </div>
         
-      <div class="bottom-actions">
-          <button id="btnAddItem" class="btn btn-main">+ ADICIONAR ITEM</button>
-          <button id="btnOpenBulk" class="btn btn-sub">IMPORTAR LISTA TEXTUAL</button>
-          <button id="btnCopyList" class="btn btn-sub">COPIAR LISTA (TEXTO)</button>
-          <button id="btnClearAll" class="btn btn-sub danger">LIMPAR TODA A LISTA</button>
-      </div>
+        <div class="bottom-actions">
+            <!-- LINHA 1 -->
+            <button id="btnAddItem" class="btn btn-main">ADICIONAR ITEM</button>
+            
+            <!-- LINHA 2 -->
+            <div class="row-gap">
+                <button id="btnOpenBulk" class="btn btn-sub">IMPORTAR TEXTO</button>
+                <button id="btnCopyList" class="btn btn-sub">COPIAR LISTA</button>
+            </div>
+
+            <!-- LINHA 3 -->
+            <button id="btnEditDetails" class="btn btn-sub">EDITAR DETALHES</button>
+
+            <!-- LINHA 4 -->
+            <div class="row-gap">
+                <button id="btnResetChecks" class="btn btn-sub">RESETAR</button>
+                <button id="btnClearAll" class="btn btn-sub danger">LIMPAR LISTA</button>
+            </div>
+        </div>
     </main>
 
+    <!-- Modal Gerenciar Listas (Sanduíche) -->
+    <div id="modalListas" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="row-between" style="margin-bottom: 20px;">
+                <h3 style="margin:0;">Minhas Listas</h3>
+                <button class="btn-text" onclick="fecharModal('modalListas')">FECHAR</button>
+            </div>
+            <div id="containerMinhasListas" class="list-manager"></div>
+            <hr style="opacity: 0.1; margin: 20px 0;">
+            <input type="text" id="inputNomeNovaLista" class="input-modal" placeholder="Nome da nova lista...">
+            <button id="btnCriarLista" class="btn btn-main" style="margin-top:10px;">+ CRIAR NOVA LISTA</button>
+        </div>
+    </div>
+
+    <!-- Modal Editar Detalhes (Nome da Lista) -->
+<div id="modalEditList" class="modal-overlay" style="display:none;">
+    <div class="modal-content">
+        <h3>Editar Detalhes</h3>
+        
+        <div class="campo-modal">
+            <label style="font-size: 12px; opacity: 0.7;">Nome da Lista:</label>
+            <input type="text" id="inputEditNomeLista" class="input-modal" style="margin-top:5px;">
+        </div>
+
+        <!-- NOVO TOGGLE ABAIXO -->
+        <div class="row-between" style="margin-top: 20px; background: rgba(0,0,0,0.03); padding: 10px; border-radius: 8px;">
+            <span style="font-size: 14px; font-weight: bold;">Exibir Quantidades</span>
+            <label class="switch">
+                <input type="checkbox" id="toggleShowQty">
+                <span class="slider"></span>
+            </label>
+        </div>
+
+        <div class="modal-buttons" style="margin-top:20px;">
+            <button id="btnSalvarDetalhes" class="btn btn-main">SALVAR ALTERAÇÕES</button>
+            <button class="btn btn-sub" onclick="fecharModal('modalEditList')">CANCELAR</button>
+        </div>
+    </div>
+</div>
+
+    <!-- Modal Import -->
     <div id="modalImport" class="modal-overlay" style="display:none;">
         <div class="modal-content">
             <h3>Importar Texto</h3>
-            <p style="font-size: 11px; margin-bottom: 10px; opacity: 0.8;">Padrão: "Item" ou "Item x 5"</p>
             <textarea id="textoListaBulk" placeholder="Cole sua lista aqui..."></textarea>
             <div class="modal-buttons">
-                <!-- Classes padronizadas abaixo -->
                 <button id="btnConfirmarImport" class="btn btn-main">CONVERTER EM ITENS</button>
-                <button id="btnCancelarImport" class="btn btn-sub">CANCELAR</button>
+                <button class="btn btn-sub" onclick="fecharModal('modalImport')">CANCELAR</button>
             </div>
         </div>
     </div>
